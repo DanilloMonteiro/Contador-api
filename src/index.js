@@ -4,13 +4,12 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const app = express();
 
+// mongodb+srv://Danillo:danillo324@cluster0.kwdapfr.mongodb.net/?retryWrites=true&w=majority
+
 mongoose
-  .connect(
-    "mongodb+srv://danillo324:danillo324@cluster0.kwdapfr.mongodb.net/?retryWrites=true&w=majority",
-    {
-      useNewUrlParser: true,
-    }
-  )
+  .connect("mongodb://127.0.0.1/Contador", {
+    useNewUrlParser: true,
+  })
   .then(() => console.log("Connection succesful"))
   .catch((err) => console.log(err));
 
