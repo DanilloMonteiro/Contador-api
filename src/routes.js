@@ -21,8 +21,18 @@ routes.get("/:id", async function (req, res) {
 });
 
 routes.post("/", async (req, res) => {
-  const { mesa, linha, cliente, nFluig, nCiclos, contador, materialDisp } =
-    req.body;
+  const {
+    mesa,
+    linha,
+    cliente,
+    nFluig,
+    nCiclos,
+    contador,
+    materialDisp,
+    datePlan,
+    observation,
+    team,
+  } = req.body;
   let table = new Table({
     mesa: mesa,
     linha: linha,
@@ -31,6 +41,9 @@ routes.post("/", async (req, res) => {
     nCiclos: nCiclos,
     contador: contador,
     materialDisp: materialDisp,
+    datePlan: datePlan,
+    observation: observation,
+    team: team,
   });
 
   try {
@@ -44,8 +57,18 @@ routes.post("/", async (req, res) => {
 });
 
 routes.put("/:id", async function (req, res) {
-  const { mesa, linha, cliente, nFluig, nCiclos, contador, materialDisp } =
-    req.body;
+  const {
+    mesa,
+    linha,
+    cliente,
+    nFluig,
+    nCiclos,
+    contador,
+    materialDisp,
+    datePlan,
+    observation,
+    team,
+  } = req.body;
   const { id } = req.params;
 
   try {
@@ -60,10 +83,15 @@ routes.put("/:id", async function (req, res) {
           nCiclos: nCiclos,
           contador: contador,
           materialDisp: materialDisp,
+          datePlan: datePlan,
+          observation: observation,
+          team: team,
+          updated_at: new Date(),
         },
       },
       { upsert: true, new: true }
     );
+
     res.status(200).json(table);
   } catch (error) {
     res.status(500).json({ error: "Problem to find the table" });

@@ -8,10 +8,18 @@ const TableSchema = new mongoose.Schema({
   nCiclos: Number,
   contador: Boolean,
   materialDisp: Boolean,
-  createdAt: {
+  datePlan: {
     type: Date,
-    default: Date.now,
   },
+  observation: String,
+  team: String,
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+});
+
+TableSchema.pre("findByIdAndUpdate", function (next) {
+  this.updated_at = new Date();
+  next();
 });
 
 module.exports = mongoose.model("Table", TableSchema);
