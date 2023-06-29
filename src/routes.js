@@ -1,100 +1,127 @@
 const routes = require("express").Router();
-const Table = require("./models/Table");
+const Row = require("./models/Row");
 
 routes.get("/", async (req, res) => {
   try {
-    let tables = await Table.find();
-    res.status(200).json(tables);
+    let rows = await Row.find();
+    res.status(200).json(rows);
   } catch (error) {
-    res.status(500).json({ error: "Problem to find the list of table" });
+    res.status(500).json({ error: "Problem to find the list of Row" });
   }
 });
 
 routes.get("/:id", async function (req, res) {
   try {
     const { id } = req.params;
-    let table = await Table.findById(id);
-    res.status(200).json(table);
+    let row = await Row.findById(id);
+    res.status(200).json(row);
   } catch (error) {
-    res.status(500).json({ error: "Problem to find the table" });
+    res.status(500).json({ error: "Problem to find the Row" });
   }
 });
 
 routes.post("/", async (req, res) => {
   const {
-    mesa,
-    linha,
-    cliente,
-    nFluig,
-    nCiclos,
-    contador,
-    materialDisp,
-    datePlan,
+    table,
+    line,
+    customer,
+    fluig_number,
+    count_number,
+    counter,
+    material,
+    planing_date,
     observation,
     team,
+    revision,
   } = req.body;
-  let table = new Table({
-    mesa: mesa,
-    linha: linha,
-    cliente: cliente,
-    nFluig: nFluig,
-    nCiclos: nCiclos,
-    contador: contador,
-    materialDisp: materialDisp,
-    datePlan: datePlan,
+  let row = new Row({
+    table: table,
+    line: line,
+    customer: customer,
+    fluig_number: fluig_number,
+    count_number: count_number,
+    counter: counter,
+    material: material,
+    planing_date: planing_date,
     observation: observation,
     team: team,
+    revision: revision,
   });
 
   try {
-    await table.save();
+    await row.save();
 
-    res.status(200).json(table);
+    res.status(200).json(row);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Problem to create a new contador" });
+    res.status(500).json({ error: "Problem to create a new Row" });
   }
 });
 
 routes.put("/:id", async function (req, res) {
   const {
-    mesa,
-    linha,
-    cliente,
-    nFluig,
-    nCiclos,
-    contador,
-    materialDisp,
-    datePlan,
+    table,
+    line,
+    customer,
+    fluig_number,
+    count_number,
+    counter,
+    material,
+    planing_date,
     observation,
     team,
+    revision,
   } = req.body;
   const { id } = req.params;
 
   try {
-    let table = await Table.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          mesa: mesa,
-          linha: linha,
-          cliente: cliente,
-          nFluig: nFluig,
-          nCiclos: nCiclos,
-          contador: contador,
-          materialDisp: materialDisp,
-          datePlan: datePlan,
-          observation: observation,
-          team: team,
-          updated_at: new Date(),
-        },
-      },
-      { upsert: true, new: true }
-    );
+    let row_count = await Row.findById(id);
 
-    res.status(200).json(table);
+    if (row_count.count_number !== count_number) {
+      let row = await Row.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            table: table,
+            line: line,
+            customer: customer,
+            fluig_number: fluig_number,
+            count_number: count_number,
+            counter: counter,
+            material: material,
+            planing_date: planing_date,
+            observation: observation,
+            team: team,
+            revision: revision,
+            updated_at: new Date(),
+          },
+        },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json(row);
+    } else if (row_count.count_number == count_number) {
+      let row = await Row.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            table: table,
+            line: line,
+            customer: customer,
+            fluig_number: fluig_number,
+            counter: counter,
+            material: material,
+            planing_date: planing_date,
+            observation: observation,
+            team: team,
+            revision: revision,
+          },
+        },
+        { upsert: true, new: true }
+      );
+      return res.status(200).json(row);
+    }
   } catch (error) {
-    res.status(500).json({ error: "Problem to find the table" });
+    res.status(500).json({ error: "Problem to find the Row" });
   }
 });
 
