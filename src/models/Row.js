@@ -6,6 +6,8 @@ const RowSchema = new mongoose.Schema({
   customer: String,
   fluig_number: Number,
   count_number: Number,
+  last_count_number: Date,
+  digital_table: Boolean,
   counter: { type: Boolean, default: true },
   material: { type: Boolean, default: false },
   planing_date: {
@@ -13,6 +15,7 @@ const RowSchema = new mongoose.Schema({
   },
   observation: String,
   team: String,
+  date_revision: Number,
   revision: {
     R0: {
       date: { type: Date, default: Date.now },
@@ -49,7 +52,29 @@ const RowSchema = new mongoose.Schema({
       ready_filter: { type: Boolean, default: true },
       checked: { type: Boolean, default: false },
     },
+    time1: {
+      date: { type: Date },
+      date_filter: { type: Boolean, default: true },
+      ready: { type: Boolean, default: false },
+      ready_filter: { type: Boolean, default: true },
+      checked: { type: Boolean, default: false },
+    },
+    time2: {
+      date: { type: Date },
+      date_filter: { type: Boolean, default: true },
+      ready: { type: Boolean, default: false },
+      ready_filter: { type: Boolean, default: true },
+      checked: { type: Boolean, default: false },
+    },
+    time3: {
+      date: { type: Date },
+      date_filter: { type: Boolean, default: true },
+      ready: { type: Boolean, default: false },
+      ready_filter: { type: Boolean, default: true },
+      checked: { type: Boolean, default: false },
+    },
   },
+  desabled: { type: Boolean, default: false },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });

@@ -28,9 +28,11 @@ routes.post("/", async (req, res) => {
     fluig_number,
     count_number,
     counter,
+    digital_table,
     material,
     planing_date,
     observation,
+    date_revision,
     team,
     revision,
   } = req.body;
@@ -41,8 +43,10 @@ routes.post("/", async (req, res) => {
     fluig_number: fluig_number,
     count_number: count_number,
     counter: counter,
+    digital_table: digital_table,
     material: material,
     planing_date: planing_date,
+    date_revision: date_revision,
     observation: observation,
     team: team,
     revision: revision,
@@ -65,11 +69,15 @@ routes.put("/:id", async function (req, res) {
     customer,
     fluig_number,
     count_number,
+    last_count_number,
+    digital_table,
     counter,
     material,
     planing_date,
     observation,
+    date_revision,
     team,
+    desabled,
     revision,
   } = req.body;
   const { id } = req.params;
@@ -77,29 +85,41 @@ routes.put("/:id", async function (req, res) {
   try {
     let row_count = await Row.findById(id);
 
-    if (row_count.count_number !== count_number) {
+    if (row_count.count_number <= count_number) {
+      let updatedFields = {
+        table: table,
+        line: line,
+        customer: customer,
+        fluig_number: fluig_number,
+        count_number: count_number,
+        last_count_number: last_count_number,
+        digital_table: digital_table,
+        counter: counter,
+        material: material,
+        planing_date: planing_date,
+        observation: observation,
+        date_revision: date_revision,
+        team: team,
+        desabled: desabled,
+        revision: revision,
+        updated_at: new Date(),
+      };
+
+      // Atualiza last_count_number somente se count_number foi alterado
+      if (row_count.count_number !== count_number) {
+        console.log(row_count.count_number, "row_count.count_number");
+        console.log(count_number, "count_number");
+        console.log("aqui");
+        updatedFields.last_count_number = new Date();
+      }
+
       let row = await Row.findByIdAndUpdate(
         id,
-        {
-          $set: {
-            table: table,
-            line: line,
-            customer: customer,
-            fluig_number: fluig_number,
-            count_number: count_number,
-            counter: counter,
-            material: material,
-            planing_date: planing_date,
-            observation: observation,
-            team: team,
-            revision: revision,
-            updated_at: new Date(),
-          },
-        },
+        { $set: updatedFields },
         { upsert: true, new: true }
       );
       return res.status(200).json(row);
-    } else if (row_count.count_number == count_number) {
+    } else {
       let row = await Row.findByIdAndUpdate(
         id,
         {
@@ -111,8 +131,11 @@ routes.put("/:id", async function (req, res) {
             counter: counter,
             material: material,
             planing_date: planing_date,
+            digital_table: digital_table,
             observation: observation,
             team: team,
+            desabled: desabled,
+            date_revision: date_revision,
             revision: revision,
           },
         },
