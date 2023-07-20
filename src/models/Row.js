@@ -16,6 +16,12 @@ const RowSchema = new mongoose.Schema({
   observation: String,
   team: String,
   date_revision: Number,
+  notification_id: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Notification",
+    },
+  ],
   revision: {
     R0: {
       date: { type: Date, default: Date.now },

@@ -1,4 +1,5 @@
 const routes = require("express").Router();
+const Notification = require("./models/Notification");
 const Row = require("./models/Row");
 
 routes.get("/", async (req, res) => {
@@ -7,6 +8,17 @@ routes.get("/", async (req, res) => {
     res.status(200).json(rows);
   } catch (error) {
     res.status(500).json({ error: "Problem to find the list of Row" });
+  }
+});
+
+routes.get("/notifications", async (req, res) => {
+  try {
+    let notifications = await Notification.find();
+    res.status(200).json(notifications);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Problem to find the list of Notifications" });
   }
 });
 
@@ -33,6 +45,7 @@ routes.post("/", async (req, res) => {
     planing_date,
     observation,
     date_revision,
+    notification_id,
     team,
     revision,
   } = req.body;
@@ -42,6 +55,7 @@ routes.post("/", async (req, res) => {
     customer: customer,
     fluig_number: fluig_number,
     count_number: count_number,
+    notification_id: notification_id,
     counter: counter,
     digital_table: digital_table,
     material: material,
@@ -76,6 +90,7 @@ routes.put("/:id", async function (req, res) {
     planing_date,
     observation,
     date_revision,
+    notification_id,
     team,
     desabled,
     revision,
@@ -83,66 +98,57 @@ routes.put("/:id", async function (req, res) {
   const { id } = req.params;
 
   try {
-    let row_count = await Row.findById(id);
+    let updatedFields = {
+      table: table,
+      line: line,
+      customer: customer,
+      fluig_number: fluig_number,
+      count_number: count_number,
+      last_count_number: last_count_number,
+      digital_table: digital_table,
+      counter: counter,
+      material: material,
+      planing_date: planing_date,
+      observation: observation,
+      notification_id: notification_id,
+      date_revision: date_revision,
+      team: team,
+      desabled: desabled,
+      revision: revision,
+      updated_at: new Date(),
+    };
 
-    if (row_count.count_number <= count_number) {
-      let updatedFields = {
-        table: table,
-        line: line,
-        customer: customer,
-        fluig_number: fluig_number,
-        count_number: count_number,
-        last_count_number: last_count_number,
-        digital_table: digital_table,
-        counter: counter,
-        material: material,
-        planing_date: planing_date,
-        observation: observation,
-        date_revision: date_revision,
-        team: team,
-        desabled: desabled,
-        revision: revision,
-        updated_at: new Date(),
-      };
+    // console.log("1");
+    // let noti;
+    // let noti2;
 
-      // Atualiza last_count_number somente se count_number foi alterado
-      if (row_count.count_number !== count_number) {
-        console.log(row_count.count_number, "row_count.count_number");
-        console.log(count_number, "count_number");
-        console.log("aqui");
-        updatedFields.last_count_number = new Date();
-      }
+    // if (updatedFields.count_number !== count_number) {
+    //   console.log("2");
+    //   updatedFields.last_count_number = new Date();
+    // } else {
+    //   console.log("3");
+    //   let notifications = {
+    //     body: "O numero recebido é menor que o anterior",
+    //     row_id: id,
+    //   };
+    //   noti = await Notification.create(notifications);
 
-      let row = await Row.findByIdAndUpdate(
-        id,
-        { $set: updatedFields },
-        { upsert: true, new: true }
-      );
-      return res.status(200).json(row);
-    } else {
-      let row = await Row.findByIdAndUpdate(
-        id,
-        {
-          $set: {
-            table: table,
-            line: line,
-            customer: customer,
-            fluig_number: fluig_number,
-            counter: counter,
-            material: material,
-            planing_date: planing_date,
-            digital_table: digital_table,
-            observation: observation,
-            team: team,
-            desabled: desabled,
-            date_revision: date_revision,
-            revision: revision,
-          },
-        },
-        { upsert: true, new: true }
-      );
-      return res.status(200).json(row);
-    }
+    //   // Adiciona a notificação ao array notification_id
+    //   if (updatedFields.notification_id) {
+    //     updatedFields.notification_id.push(noti._id);
+    //   } else {
+    //     updatedFields.notification_id = [noti._id];
+    //   }
+    // }
+
+    console.log("4");
+
+    let row = await Row.findByIdAndUpdate(
+      id,
+      { $set: updatedFields },
+      { upsert: true, new: true }
+    );
+    return res.status(200).json(row);
   } catch (error) {
     res.status(500).json({ error: "Problem to find the Row" });
   }
