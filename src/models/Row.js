@@ -1,12 +1,13 @@
 const mongoose = require("mongoose");
 
 const RowSchema = new mongoose.Schema({
-  table: String,
-  line: String,
-  customer: String,
-  fluig_number: Number,
-  count_number: Number,
+  table: { type: String, required: true },
+  line: { type: String, required: true },
+  customer: { type: String, required: true },
+  fluig_number: { type: Number, required: true },
+  count_number: { type: Number, default: 0 },
   last_count_number: Date,
+  stop_table: { type: Number, default: 30000 },
   digital_table: Boolean,
   counter: { type: Boolean, default: true },
   material: { type: Boolean, default: false },
@@ -16,7 +17,7 @@ const RowSchema = new mongoose.Schema({
   observation: String,
   team: String,
   date_revision: Number,
-  notification_id: [
+  notifications: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Notification",
