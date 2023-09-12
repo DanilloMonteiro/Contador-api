@@ -1,24 +1,15 @@
-const routes = require("express").Router();
-const Notification = require("./models/Notification");
+const express = require("express");
 const Row = require("./models/Row");
+const Notification = require("./models/Notification");
+const routes = express.Router();
 
 routes.get("/", async (req, res) => {
+  // Rota para listar todas as linhas
   try {
-    let rows = await Row.find();
+    let rows = await Row.find().populate("board");
     res.status(200).json(rows);
   } catch (error) {
     res.status(500).json({ error: "Problem to find the list of Row" });
-  }
-});
-
-routes.get("/notifications", async (req, res) => {
-  try {
-    let notifications = await Notification.find();
-    res.status(200).json(notifications);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Problem to find the list of Notifications" });
   }
 });
 
@@ -32,19 +23,14 @@ routes.get("/:id", async function (req, res) {
   }
 });
 
-routes.post("/notifications", async (req, res) => {
-  const { title, body } = req.body;
-
+routes.get("/table/:table", async function (req, res) {
   try {
-    const newNotification = new Notification({
-      title: title,
-      body: body,
-    });
-
-    const savedNotification = await newNotification.save();
-    res.status(201).json(savedNotification);
+    const { table } = req.params;
+    console.log(table);
+    let row = await Row.findOne({ table: `Mesa ${table}` }).populate("board");
+    res.status(200).json(row);
   } catch (error) {
-    res.status(500).json({ error: "Failed to create a new notification" });
+    res.status(500).json({ error: "Problem to find the Row" });
   }
 });
 
@@ -55,16 +41,19 @@ routes.post("/", async (req, res) => {
     customer,
     fluig_number,
     count_number,
-    counter,
-    digital_table,
-    material,
+    last_count_date,
     stop_table,
+    digital_table,
+    board,
+    has_counter,
+    material,
     planing_date,
     observation,
-    date_revision,
-    notifications_id,
     team,
+    date_revision,
+    notifications,
     revision,
+    disabled,
   } = req.body;
   let row = new Row({
     table: table,
@@ -72,25 +61,28 @@ routes.post("/", async (req, res) => {
     customer: customer,
     fluig_number: fluig_number,
     count_number: count_number,
-    notifications_id: notifications_id,
-    counter: counter,
+    last_count_date: last_count_date,
     stop_table: stop_table,
     digital_table: digital_table,
+    board: board,
+    has_counter: has_counter,
     material: material,
     planing_date: planing_date,
-    date_revision: date_revision,
     observation: observation,
     team: team,
+    date_revision: date_revision,
+    notifications: notifications,
     revision: revision,
+    disabled: disabled,
   });
 
   try {
     await row.save();
 
-    res.status(200).json(row);
+    res.status(200).json({ row, id: row._id });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Problem to create a new Row" });
+    res.status(500).json({ error: "Problem to create a new Row", id: row._id });
   }
 });
 
@@ -101,17 +93,19 @@ routes.put("/:id", async function (req, res) {
     customer,
     fluig_number,
     count_number,
-    last_count_number,
-    digital_table,
-    counter,
-    material,
+    last_count_date,
     stop_table,
+    digital_table,
+    board,
+    has_counter,
+    material,
     planing_date,
     observation,
-    date_revision,
     team,
-    desabled,
+    date_revision,
+    notifications,
     revision,
+    disabled,
   } = req.body;
   const { id } = req.params;
 
@@ -124,17 +118,19 @@ routes.put("/:id", async function (req, res) {
       customer: customer,
       fluig_number: fluig_number,
       count_number: count_number,
-      last_count_number: last_count_number,
-      digital_table: digital_table,
-      counter: counter,
-      material: material,
+      last_count_date: last_count_date,
       stop_table: stop_table,
+      digital_table: digital_table,
+      board: board,
+      has_counter: has_counter,
+      material: material,
       planing_date: planing_date,
       observation: observation,
-      date_revision: date_revision,
       team: team,
-      desabled: desabled,
+      date_revision: date_revision,
+      notifications: notifications,
       revision: revision,
+      disabled: disabled,
       updated_at: new Date(),
     };
 
@@ -181,17 +177,6 @@ routes.put("/:id", async function (req, res) {
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Problem to find the Row" });
-  }
-});
-
-routes.delete("/notifications/:id", async function (req, res) {
-  const { id } = req.params;
-
-  try {
-    await Notification.findByIdAndDelete(id);
-    res.json({ message: "Ok" }).status(204);
-  } catch (error) {
-    res.status(500).json({ error: "Problem to delete a notification" });
   }
 });
 

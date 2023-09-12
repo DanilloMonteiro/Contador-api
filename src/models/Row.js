@@ -1,15 +1,19 @@
 const mongoose = require("mongoose");
 
 const RowSchema = new mongoose.Schema({
-  table: { type: String, required: true },
+  table: { type: String, required: true, unique: true },
   line: { type: String, required: true },
   customer: { type: String, required: true },
   fluig_number: { type: Number, required: true },
   count_number: { type: Number, default: 0 },
-  last_count_number: Date,
+  last_count_date: Date,
   stop_table: { type: Number, default: 30000 },
   digital_table: Boolean,
-  counter: { type: Boolean, default: true },
+  board: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Board",
+  },
+  has_counter: { type: Boolean, default: true },
   material: { type: Boolean, default: false },
   planing_date: {
     type: Date,
@@ -81,7 +85,7 @@ const RowSchema = new mongoose.Schema({
       checked: { type: Boolean, default: false },
     },
   },
-  desabled: { type: Boolean, default: false },
+  disabled: { type: Boolean, default: false },
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },
 });
