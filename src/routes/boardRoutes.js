@@ -1,7 +1,20 @@
 const express = require("express");
-const Board = require("./models/Board");
-const Row = require("./models/Row");
+const Board = require("../models/Board");
+const Row = require("../models/Row");
 const routes = express.Router();
+
+var mqtt = require("mqtt");
+
+var options = {
+  host: "6596d56e9ba5437781a17a0edd528963.s2.eu.hivemq.cloud",
+  port: 8883,
+  protocol: "mqtts",
+  username: "DanilloBra",
+  password: "braBRA1414",
+};
+
+// initialize the MQTT client
+var client = mqtt.connect(options);
 
 routes.get("/", async (req, res) => {
   try {
@@ -24,20 +37,24 @@ routes.get("/mac/:macAddress", async function (req, res) {
         mac: macAddress,
       });
 
+      isANewBoard = true;
+
       await newBoard.save();
     }
 
     let row = await Row.findOne({ board: board._id });
 
     if (row) {
-      res.status(200).json({ id: row._id, status: "connected" });
+      res
+        .status(200)
+        .json({ id: row._id, status: "connected", counter: row.count_number });
     } else if (isANewBoard == true) {
-      res.status(200).json({ status: "new board created and cant find a row" });
-    } else {
-      res.status(200).json({ status: "cant find a row" });
+      res.status(200).json({ status: "New board created and cant find a row" });
+    } else if (!row) {
+      res.status(200).json({ status: "Can't find a row" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Problem to find the Row 1" });
+    res.status(500).json({ error: "Problem in route /boards/mac/mac:" });
   }
 });
 
@@ -72,6 +89,11 @@ routes.put("/:id", async function (req, res) {
       { $set: updatedFields },
       { upsert: true, new: true }
     );
+
+    if (board) {
+      client.publish("command1", mac);
+    }
+
     return res.status(200).json(board);
   } catch (error) {
     console.log(error);
